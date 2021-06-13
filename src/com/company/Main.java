@@ -1,18 +1,70 @@
 package com.company;
 
-import java.util.HashMap;
-
 public class Main {
 
+
     public static void main(String[] args) {
-        String[] manyWords={"cat","dog","gun","table","ant","dog","cat","gun","cat","dog","dog"};
-        HashMap<String,Integer> map=new HashMap<>();
-        for (String word: manyWords){
-            if (!map.containsKey(word))
-                map.put(word,1);
-            else
-                map.put(word,map.get(word)+1);
-        }
-        System.out.println(map);
+        firstMethod();
+        secondMethod();
     }
+
+    public static void firstMethod() {
+        int size = 10_000_000;
+        float[] arr = new float[size];
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = 1.0f;
+        }
+        long startTime = System.currentTimeMillis();
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = (float) (arr[i] * Math.sin(0.2f + i / 5) * Math.cos(0.2f + i / 5) * Math.cos(0.4f + i / 2));
+        }
+        System.out.println("One thread time: " + (System.currentTimeMillis() - startTime) + " ms.");
+    }
+
+
+
+    public static void secondMethod() {
+        int size = 10_000_000;
+        float[] arr = new float[size];
+        float[] leftHalf = new float [size/2];
+        float[] rightHalf = new float[size/2];
+        System.arraycopy(arr, 0, leftHalf, 0, leftHalf.length);
+        System.arraycopy(arr, 5_000_000, rightHalf, 0,rightHalf.length);
+
+
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = 1.0f;
+        }
+
+        long startTime = System.currentTimeMillis();
+        Thread thread1 =new Thread((Runnable) () -> {
+            for (int i = 0; i < leftHalf.length; i++) {
+                leftHalf[i] = (int) (leftHalf[i] * Math.sin(0.2f + i / 5) * Math.cos(0.2f + i / 5) * Math.cos(0.4f + i / 2));
+            }
+            System.out.println("1 thread time: " + (System.currentTimeMillis() - startTime) + " ms.");
+
+
+        }); thread1.start();
+        Thread thread2 =new Thread((Runnable) () -> {
+            for (int i = 0; i < rightHalf.length; i++) {
+                rightHalf[i] = (int) (rightHalf[i] * Math.sin(0.2f + i / 5) * Math.cos(0.2f + i / 5) * Math.cos(0.4f + i / 2));
+            }
+            System.out.println("2 thread time: " + (System.currentTimeMillis() - startTime) + " ms.");
+
+        }); thread2.start();
+
+
+
+    }
+
+
+
 }
+
+
+
+
+
+
+
+
